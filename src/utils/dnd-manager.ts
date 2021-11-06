@@ -45,6 +45,16 @@ export const wrapSource = (el, startDrag, endDrag, dndType) => {
   return dragSource(dndType, nodeDragSource, nodeDragSourcePropInjection)(el)
 }
 
+const propInjection = (connect, monitor) => {
+  const dragged = monitor.getItem()
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver(),
+    canDrop: monitor.canDrop(),
+    draggedNode: dragged ? dragged.node : null,
+  }
+}
+
 export const wrapPlaceholder = (el, treeId, drop, dndType) => {
   const placeholderDropTarget = {
     drop: (dropTargetProps, monitor) => {
@@ -64,21 +74,7 @@ export const wrapPlaceholder = (el, treeId, drop, dndType) => {
     },
   }
 
-  const placeholderPropInjection = (connect, monitor) => {
-    const dragged = monitor.getItem()
-    return {
-      connectDropTarget: connect.dropTarget(),
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-      draggedNode: dragged ? dragged.node : null,
-    }
-  }
-
-  return dropTarget(
-    dndType,
-    placeholderDropTarget,
-    placeholderPropInjection
-  )(el)
+  return dropTarget(dndType, placeholderDropTarget, propInjection)(el)
 }
 
 const getTargetDepth = (
@@ -298,15 +294,5 @@ export const wrapTarget = (
       ),
   }
 
-  const nodeDropTargetPropInjection = (connect, monitor) => {
-    const dragged = monitor.getItem()
-    return {
-      connectDropTarget: connect.dropTarget(),
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-      draggedNode: dragged ? dragged.node : null,
-    }
-  }
-
-  return dropTarget(dndType, nodeDropTarget, nodeDropTargetPropInjection)(el)
+  return dropTarget(dndType, nodeDropTarget, propInjection)(el)
 }

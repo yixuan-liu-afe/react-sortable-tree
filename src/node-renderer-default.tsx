@@ -98,7 +98,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
       handle = (
         <div className="rst__loadingHandle">
           <div className="rst__loadingCircle">
-            {[...new Array(12)].map((_, index) => (
+            {Array.from(new Array(12), (_, index) => (
               <div
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}

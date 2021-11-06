@@ -3,15 +3,29 @@
     "browser": true,
     "shared-node-browser": true,
     "node": true,
-    "es6": true
+    "es2020": true
   },
   "extends": [
     "prettier",
     "plugin:prettier/recommended",
     "plugin:import/errors",
-    "plugin:import/warnings"
+    "plugin:import/warnings",
+    "plugin:array-func/all",
+    "plugin:sonarjs/recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+    "plugin:promise/recommended"
   ],
-  "plugins": ["@typescript-eslint", "react", "prettier", "import", "jest"],
+  "plugins": [
+    "@typescript-eslint",
+    "react",
+    "prettier",
+    "import",
+    "sonarjs",
+    "array-func",
+    "promise"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020,
@@ -35,10 +49,6 @@
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-empty-interface": "off",
     "@typescript-eslint/no-explicit-any": "off",
-    "jest/consistent-test-it": [
-      "error",
-      { "fn": "it", "withinDescribe": "it" }
-    ],
     "import/order": [
       "error",
       {
