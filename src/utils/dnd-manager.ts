@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 import { DragSource as dragSource, DropTarget as dropTarget } from 'react-dnd'
-import { findDOMNode } from 'react-dom'
 import { memoizedInsertNode } from './memoized-tree-data-utils'
 import { getDepth } from './tree-data-utils'
 
