@@ -1,11 +1,4 @@
-# Note
-
-I decide to made the fork because it looks like the original author is not really interested in fixing any issues founded by community or even applying any community patches.
-
-## About issue
-I made the fork just for myself to solve my own tasks. If you are still using the original package and find any issues, you can send me PR with solution.
-I have no plans to fix all the issues (which already was found by community). I will only do this if the problem is blocking my own tasks. Just because I do not have time to solve all issues.
-
+# Note: TypeScript support (included from v4)
 
 <div align="center">
   <img src="https://cloud.githubusercontent.com/assets/4413963/18860410/26f64de8-84b8-11e6-9284-350308eed30a.png"/>
