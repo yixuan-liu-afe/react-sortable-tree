@@ -1,8 +1,6 @@
 import React, { Children, cloneElement } from 'react'
-// eslint-disable-next-line import/named
 import { ConnectDropTarget } from 'react-dnd'
 import { TreeItem } from '.'
-// eslint-disable-next-line import/named
 
 const defaultProps = {
   canDrop: false,

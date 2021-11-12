@@ -107,7 +107,8 @@ const getTargetDepth = (
     dragSourceInitialDepth = 0
 
     if (component) {
-      const relativePosition = findDOMNode(component)?.getBoundingClientRect() // eslint-disable-line react/no-find-dom-node
+      const rawComponent = component.getDecoratedComponentInstance()
+      const relativePosition = rawComponent.node.getBoundingClientRect()
       const leftShift =
         monitor.getSourceClientOffset().x - relativePosition.left
       blocksOffset = Math.round(

@@ -1,9 +1,7 @@
 import React, { Children, cloneElement } from 'react'
-// eslint-disable-next-line import/named
 import { ConnectDropTarget } from 'react-dnd'
 import { classnames } from './utils/classnames'
 import './tree-node.css'
-// eslint-disable-next-line import/named
 import { TreeItem, TreePath } from '.'
 
 export interface TreeNode {
@@ -155,8 +153,7 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
         highlightLineClass = 'rst__highlightLineVertical'
       }
 
-      let style
-      style =
+      const style =
         rowDirection === 'rtl'
           ? {
               width: scaffoldBlockPxWidth,
@@ -169,7 +166,6 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
 
       scaffold.push(
         <div
-          // eslint-disable-next-line react/no-array-index-key
           key={i}
           style={style}
           className={classnames(

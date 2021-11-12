@@ -22,7 +22,6 @@ export default class App extends Component {
     const { lastMovePrevPath, lastMoveNextPath, lastMoveNode } = this.state
 
     const recordCall = (name, args) => {
-      // eslint-disable-next-line no-console
       console.log(`${name} called with arguments:`, args)
     }
 

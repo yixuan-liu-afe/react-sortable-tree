@@ -13,7 +13,6 @@ import { Virtuoso } from 'react-virtuoso'
 import NodeRendererDefault from './node-renderer-default'
 import PlaceholderRendererDefault from './placeholder-renderer-default'
 import './react-sortable-tree.css'
-// eslint-disable-next-line import/no-named-as-default
 import TreeNode from './tree-node'
 import TreePlaceholder from './tree-placeholder'
 import { classnames } from './utils/classnames'
@@ -69,6 +68,119 @@ const mergeTheme = (props) => {
 }
 
 class ReactSortableTree extends Component {
+  // returns the new state after search
+  static search(props, state, seekIndex, expand, singleSearch) {
+    const {
+      onChange,
+      getNodeKey,
+      searchFinishCallback,
+      searchQuery,
+      searchMethod,
+      searchFocusOffset,
+      onlyExpandSearchedNodes,
+    } = props
+
+    const { instanceProps } = state
+
+    // Skip search if no conditions are specified
+    if (!searchQuery && !searchMethod) {
+      if (searchFinishCallback) {
+        searchFinishCallback([])
+      }
+
+      return { searchMatches: [] }
+    }
+
+    const newState = { instanceProps: {} }
+
+    // if onlyExpandSearchedNodes collapse the tree and search
+    const { treeData: expandedTreeData, matches: searchMatches } = find({
+      getNodeKey,
+      treeData: onlyExpandSearchedNodes
+        ? toggleExpandedForAll({
+            treeData: instanceProps.treeData,
+            expanded: false,
+          })
+        : instanceProps.treeData,
+      searchQuery,
+      searchMethod: searchMethod || defaultSearchMethod,
+      searchFocusOffset,
+      expandAllMatchPaths: expand && !singleSearch,
+      expandFocusMatchPaths: !!expand,
+    })
+
+    // Update the tree with data leaving all paths leading to matching nodes open
+    if (expand) {
+      newState.instanceProps.ignoreOneTreeUpdate = true // Prevents infinite loop
+      onChange(expandedTreeData)
+    }
+
+    if (searchFinishCallback) {
+      searchFinishCallback(searchMatches)
+    }
+
+    let searchFocusTreeIndex
+    if (
+      seekIndex &&
+      searchFocusOffset !== undefined &&
+      searchFocusOffset < searchMatches.length
+    ) {
+      searchFocusTreeIndex = searchMatches[searchFocusOffset].treeIndex
+    }
+
+    newState.searchMatches = searchMatches
+    newState.searchFocusTreeIndex = searchFocusTreeIndex
+
+    return newState
+  }
+
+  // Load any children in the tree that are given by a function
+  // calls the onChange callback on the new treeData
+  static loadLazyChildren(props, state) {
+    const { instanceProps } = state
+
+    walk({
+      treeData: instanceProps.treeData,
+      getNodeKey: props.getNodeKey,
+      callback: ({ node, path, lowerSiblingCounts, treeIndex }) => {
+        // If the node has children defined by a function, and is either expanded
+        //  or set to load even before expansion, run the function.
+        if (
+          node.children &&
+          typeof node.children === 'function' &&
+          (node.expanded || props.loadCollapsedLazyChildren)
+        ) {
+          // Call the children fetching function
+          node.children({
+            node,
+            path,
+            lowerSiblingCounts,
+            treeIndex,
+
+            // Provide a helper to append the new data when it is received
+            done: (childrenArray) =>
+              props.onChange(
+                changeNodeAtPath({
+                  treeData: instanceProps.treeData,
+                  path,
+                  newNode: ({ node: oldNode }) =>
+                    // Only replace the old node if it's the one we set off to find children
+                    //  for in the first place
+                    oldNode === node
+                      ? {
+                          ...oldNode,
+                          children: childrenArray,
+                        }
+                      : oldNode,
+                  getNodeKey: props.getNodeKey,
+                })
+              ),
+          })
+        }
+      },
+    })
+  }
+
   constructor(props) {
     super(props)
 
@@ -229,14 +341,6 @@ class ReactSortableTree extends Component {
     this.clearMonitorSubscription()
   }
 
-  getRows(treeData) {
-    return memoizedGetFlatDataFromTree({
-      ignoreCollapsed: true,
-      getNodeKey: this.props.getNodeKey,
-      treeData,
-    })
-  }
-
   handleDndMonitorChange() {
     const monitor = this.props.dragDropManager.getMonitor()
     // If the drag ends and the tree is still in a mid-drag state,
@@ -249,126 +353,12 @@ class ReactSortableTree extends Component {
     }
   }
 
-  toggleChildrenVisibility({ node: targetNode, path }) {
-    const { instanceProps } = this.state
-
-    const treeData = changeNodeAtPath({
-      treeData: instanceProps.treeData,
-      path,
-      newNode: ({ node }) => ({ ...node, expanded: !node.expanded }),
+  getRows(treeData) {
+    return memoizedGetFlatDataFromTree({
+      ignoreCollapsed: true,
       getNodeKey: this.props.getNodeKey,
-    })
-
-    this.props.onChange(treeData)
-
-    this.props.onVisibilityToggle({
       treeData,
-      node: targetNode,
-      expanded: !targetNode.expanded,
-      path,
     })
-  }
-
-  moveNode({
-    node,
-    path: prevPath,
-    treeIndex: prevTreeIndex,
-    depth,
-    minimumTreeIndex,
-  }) {
-    const {
-      treeData,
-      treeIndex,
-      path,
-      parentNode: nextParentNode,
-    } = insertNode({
-      treeData: this.state.draggingTreeData,
-      newNode: node,
-      depth,
-      minimumTreeIndex,
-      expandParent: true,
-      getNodeKey: this.props.getNodeKey,
-    })
-
-    this.props.onChange(treeData)
-
-    this.props.onMoveNode({
-      treeData,
-      node,
-      treeIndex,
-      path,
-      nextPath: path,
-      nextTreeIndex: treeIndex,
-      prevPath,
-      prevTreeIndex,
-      nextParentNode,
-    })
-  }
-
-  // returns the new state after search
-  static search(props, state, seekIndex, expand, singleSearch) {
-    const {
-      onChange,
-      getNodeKey,
-      searchFinishCallback,
-      searchQuery,
-      searchMethod,
-      searchFocusOffset,
-      onlyExpandSearchedNodes,
-    } = props
-
-    const { instanceProps } = state
-
-    // Skip search if no conditions are specified
-    if (!searchQuery && !searchMethod) {
-      if (searchFinishCallback) {
-        searchFinishCallback([])
-      }
-
-      return { searchMatches: [] }
-    }
-
-    const newState = { instanceProps: {} }
-
-    // if onlyExpandSearchedNodes collapse the tree and search
-    const { treeData: expandedTreeData, matches: searchMatches } = find({
-      getNodeKey,
-      treeData: onlyExpandSearchedNodes
-        ? toggleExpandedForAll({
-            treeData: instanceProps.treeData,
-            expanded: false,
-          })
-        : instanceProps.treeData,
-      searchQuery,
-      searchMethod: searchMethod || defaultSearchMethod,
-      searchFocusOffset,
-      expandAllMatchPaths: expand && !singleSearch,
-      expandFocusMatchPaths: !!expand,
-    })
-
-    // Update the tree with data leaving all paths leading to matching nodes open
-    if (expand) {
-      newState.instanceProps.ignoreOneTreeUpdate = true // Prevents infinite loop
-      onChange(expandedTreeData)
-    }
-
-    if (searchFinishCallback) {
-      searchFinishCallback(searchMatches)
-    }
-
-    let searchFocusTreeIndex
-    if (
-      seekIndex &&
-      searchFocusOffset !== undefined &&
-      searchFocusOffset < searchMatches.length
-    ) {
-      searchFocusTreeIndex = searchMatches[searchFocusOffset].treeIndex
-    }
-
-    newState.searchMatches = searchMatches
-    newState.searchFocusTreeIndex = searchFocusTreeIndex
-
-    return newState
   }
 
   startDrag = ({ path }) => {
@@ -444,7 +434,8 @@ class ReactSortableTree extends Component {
   endDrag = (dropResult) => {
     const { instanceProps } = this.state
 
-    const resetTree = () =>
+    // Drop was cancelled
+    if (!dropResult) {
       this.setState({
         draggingTreeData: undefined,
         draggedNode: undefined,
@@ -452,10 +443,6 @@ class ReactSortableTree extends Component {
         draggedDepth: undefined,
         dragging: false,
       })
-
-    // Drop was cancelled
-    if (!dropResult) {
-      resetTree()
     } else if (dropResult.treeId !== this.treeId) {
       // The node was dropped in an external drop target or tree
       const { node, path, treeIndex } = dropResult
@@ -508,50 +495,59 @@ class ReactSortableTree extends Component {
     return true
   }
 
-  // Load any children in the tree that are given by a function
-  // calls the onChange callback on the new treeData
-  static loadLazyChildren(props, state) {
-    const { instanceProps } = state
+  toggleChildrenVisibility({ node: targetNode, path }) {
+    const { instanceProps } = this.state
 
-    walk({
+    const treeData = changeNodeAtPath({
       treeData: instanceProps.treeData,
-      getNodeKey: props.getNodeKey,
-      callback: ({ node, path, lowerSiblingCounts, treeIndex }) => {
-        // If the node has children defined by a function, and is either expanded
-        //  or set to load even before expansion, run the function.
-        if (
-          node.children &&
-          typeof node.children === 'function' &&
-          (node.expanded || props.loadCollapsedLazyChildren)
-        ) {
-          // Call the children fetching function
-          node.children({
-            node,
-            path,
-            lowerSiblingCounts,
-            treeIndex,
+      path,
+      newNode: ({ node }) => ({ ...node, expanded: !node.expanded }),
+      getNodeKey: this.props.getNodeKey,
+    })
 
-            // Provide a helper to append the new data when it is received
-            done: (childrenArray) =>
-              props.onChange(
-                changeNodeAtPath({
-                  treeData: instanceProps.treeData,
-                  path,
-                  newNode: ({ node: oldNode }) =>
-                    // Only replace the old node if it's the one we set off to find children
-                    //  for in the first place
-                    oldNode === node
-                      ? {
-                          ...oldNode,
-                          children: childrenArray,
-                        }
-                      : oldNode,
-                  getNodeKey: props.getNodeKey,
-                })
-              ),
-          })
-        }
-      },
+    this.props.onChange(treeData)
+
+    this.props.onVisibilityToggle({
+      treeData,
+      node: targetNode,
+      expanded: !targetNode.expanded,
+      path,
+    })
+  }
+
+  moveNode({
+    node,
+    path: prevPath,
+    treeIndex: prevTreeIndex,
+    depth,
+    minimumTreeIndex,
+  }) {
+    const {
+      treeData,
+      treeIndex,
+      path,
+      parentNode: nextParentNode,
+    } = insertNode({
+      treeData: this.state.draggingTreeData,
+      newNode: node,
+      depth,
+      minimumTreeIndex,
+      expandParent: true,
+      getNodeKey: this.props.getNodeKey,
+    })
+
+    this.props.onChange(treeData)
+
+    this.props.onMoveNode({
+      treeData,
+      node,
+      treeIndex,
+      path,
+      nextPath: path,
+      nextTreeIndex: treeIndex,
+      prevPath,
+      prevTreeIndex,
+      nextParentNode,
     })
   }
 
@@ -830,7 +826,7 @@ type ReactSortableTreeProps = {
 
   // Used by the `searchMethod` to highlight and scroll to matched nodes.
   // Should be a string for the default `searchMethod`, but can be anything when using a custom search.
-  searchQuery?: string // eslint-disable-line react/forbid-prop-types
+  searchQuery?: string
 
   // Outline the <`searchFocusOffset`>th node and scroll to it.
   searchFocusOffset?: number

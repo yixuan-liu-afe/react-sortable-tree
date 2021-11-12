@@ -1,5 +1,4 @@
 import React from 'react'
-// eslint-disable-next-line import/named
 import { ConnectDragPreview, ConnectDragSource } from 'react-dnd'
 import { classnames } from './utils/classnames'
 import { isDescendant } from './utils/tree-data-utils'
@@ -98,7 +97,6 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
           <div className="rst__loadingCircle">
             {[...Array.from({ length: 12 })].map((_, index) => (
               <div
-                // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 className={classnames(
                   'rst__loadingCirclePoint',
@@ -217,9 +215,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
 
               <div className="rst__rowToolbar">
                 {buttons?.map((btn, index) => (
-                  <div
-                    key={index} // eslint-disable-line react/no-array-index-key
-                    className="rst__toolbarButton">
+                  <div key={index} className="rst__toolbarButton">
                     {btn}
                   </div>
                 ))}
