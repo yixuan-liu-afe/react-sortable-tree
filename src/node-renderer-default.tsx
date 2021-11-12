@@ -30,7 +30,7 @@ export interface NodeRendererProps {
   isSearchFocus: boolean
   canDrag: boolean
   scaffoldBlockPxWidth: number
-  toggleChildrenVisibility?(data: NodeData): void | undefined | null
+  toggleChildrenVisibility?(data: NodeData): void | undefined
   buttons?: JSX.Element[] | undefined
   className?: string | undefined
   style?: React.CSSProperties | undefined
@@ -57,7 +57,7 @@ export interface NodeRendererProps {
   canDrop?: boolean | undefined
 }
 
-const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
+const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
   props = { ...defaultProps, ...props }
 
   const {
@@ -88,17 +88,15 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
   } = props
   const nodeTitle = title || node.title
   const nodeSubtitle = subtitle || node.subtitle
-  const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null
+  const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
   let handle
   if (canDrag) {
-    if (typeof node.children === 'function' && node.expanded) {
-      // Show a loading symbol on the handle when the children are expanded
-      //  and yet still defined by a function (a callback to fetch the children)
-      handle = (
+    handle =
+      typeof node.children === 'function' && node.expanded ? (
         <div className="rst__loadingHandle">
           <div className="rst__loadingCircle">
-            {Array.from(new Array(12), (_, index) => (
+            {[...Array.from({ length: 12 })].map((_, index) => (
               <div
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
@@ -110,13 +108,11 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = (props) => {
             ))}
           </div>
         </div>
+      ) : (
+        connectDragSource(<div className="rst__moveHandle" />, {
+          dropEffect: 'copy',
+        })
       )
-    } else {
-      // Show the handle used to initiate a drag-and-drop
-      handle = connectDragSource(<div className="rst__moveHandle" />, {
-        dropEffect: 'copy',
-      })
-    }
   }
 
   const isDraggedDescendant = draggedNode && isDescendant(draggedNode, node)

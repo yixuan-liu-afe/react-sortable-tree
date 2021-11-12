@@ -36,7 +36,7 @@ export interface TreeRendererProps {
   draggedNode?: TreeItem | undefined
 
   // used in dndManager
-  getPrevRow: () => FlatDataItem | null
+  getPrevRow: () => FlatDataItem | undefined
   node: TreeItem
   path: number[]
 }
@@ -73,12 +73,12 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
     ...otherProps
   } = props
 
-  const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null
+  const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
   // Construct the scaffold representing the structure of the tree
   const scaffoldBlockCount = lowerSiblingCounts.length
   const scaffold: any[] = []
-  lowerSiblingCounts.forEach((lowerSiblingCount, i) => {
+  for (const [i, lowerSiblingCount] of lowerSiblingCounts.entries()) {
     let lineClass = ''
     if (lowerSiblingCount > 0) {
       // At this level in the tree, the nodes had sibling nodes further down
@@ -156,18 +156,16 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
       }
 
       let style
-      if (rowDirection === 'rtl') {
-        style = {
-          width: scaffoldBlockPxWidth,
-          right: scaffoldBlockPxWidth * i,
-        }
-      } else {
-        // Default ltr
-        style = {
-          width: scaffoldBlockPxWidth,
-          left: scaffoldBlockPxWidth * i,
-        }
-      }
+      style =
+        rowDirection === 'rtl'
+          ? {
+              width: scaffoldBlockPxWidth,
+              right: scaffoldBlockPxWidth * i,
+            }
+          : {
+              width: scaffoldBlockPxWidth,
+              left: scaffoldBlockPxWidth * i,
+            }
 
       scaffold.push(
         <div
@@ -182,15 +180,13 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
         />
       )
     }
-  })
+  }
 
   let style
-  if (rowDirection === 'rtl') {
-    style = { right: scaffoldBlockPxWidth * scaffoldBlockCount }
-  } else {
-    // Default ltr
-    style = { left: scaffoldBlockPxWidth * scaffoldBlockCount }
-  }
+  style =
+    rowDirection === 'rtl'
+      ? { right: scaffoldBlockPxWidth * scaffoldBlockCount }
+      : { left: scaffoldBlockPxWidth * scaffoldBlockCount }
 
   return connectDropTarget(
     <div

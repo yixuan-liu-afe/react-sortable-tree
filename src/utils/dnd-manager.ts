@@ -7,6 +7,13 @@ import { getDepth } from './tree-data-utils'
 
 let rafId = 0
 
+const nodeDragSourcePropInjection = (connect, monitor) => ({
+  connectDragSource: connect.dragSource(),
+  connectDragPreview: connect.dragPreview(),
+  isDragging: monitor.isDragging(),
+  didDrop: monitor.didDrop(),
+})
+
 export const wrapSource = (el, startDrag, endDrag, dndType) => {
   const nodeDragSource = {
     beginDrag: (props) => {
@@ -33,15 +40,6 @@ export const wrapSource = (el, startDrag, endDrag, dndType) => {
     },
   }
 
-  const nodeDragSourcePropInjection = (connect, monitor) => {
-    return {
-      connectDragSource: connect.dragSource(),
-      connectDragPreview: connect.dragPreview(),
-      isDragging: monitor.isDragging(),
-      didDrop: monitor.didDrop(),
-    }
-  }
-
   return dragSource(dndType, nodeDragSource, nodeDragSourcePropInjection)(el)
 }
 
@@ -51,7 +49,7 @@ const propInjection = (connect, monitor) => {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver(),
     canDrop: monitor.canDrop(),
-    draggedNode: dragged ? dragged.node : null,
+    draggedNode: dragged ? dragged.node : undefined,
   }
 }
 
@@ -63,7 +61,7 @@ export const wrapPlaceholder = (el, treeId, drop, dndType) => {
         node,
         path,
         treeIndex,
-        treeId: treeId,
+        treeId,
         minimumTreeIndex: 0,
         depth: 0,
       }
@@ -89,10 +87,11 @@ const getTargetDepth = (
 
   const rowAbove = dropTargetProps.getPrevRow()
   if (rowAbove) {
+    const { node } = rowAbove
     let { path } = rowAbove
-    const aboveNodeCannotHaveChildren = !canNodeHaveChildren(rowAbove.node)
+    const aboveNodeCannotHaveChildren = !canNodeHaveChildren(node)
     if (aboveNodeCannotHaveChildren) {
-      path = path.slice(0, path.length - 1)
+      path = path.slice(0, -1)
     }
 
     // Limit the length of the path to the deepest possible
@@ -133,7 +132,7 @@ const getTargetDepth = (
   )
 
   // If a maxDepth is defined, constrain the target depth
-  if (typeof maxDepth !== 'undefined' && maxDepth !== null) {
+  if (typeof maxDepth !== 'undefined' && maxDepth !== undefined) {
     const draggedNode = monitor.getItem().node
     const draggedChildDepth = getDepth(draggedNode)
 
@@ -167,7 +166,7 @@ const canDrop = (
   const targetDepth = getTargetDepth(
     dropTargetProps,
     monitor,
-    null,
+    undefined,
     canNodeHaveChildren,
     treeId,
     maxDepth
@@ -188,7 +187,7 @@ const canDrop = (
       treeData: draggingTreeData || treeReftreeData,
       newNode: node,
       depth: targetDepth,
-      getNodeKey: getNodeKey,
+      getNodeKey,
       minimumTreeIndex: dropTargetProps.listIndex,
       expandParent: true,
     })
@@ -226,7 +225,7 @@ export const wrapTarget = (
         node: monitor.getItem().node,
         path: monitor.getItem().path,
         treeIndex: monitor.getItem().treeIndex,
-        treeId: treeId,
+        treeId,
         minimumTreeIndex: dropTargetProps.treeIndex,
         depth: getTargetDepth(
           dropTargetProps,

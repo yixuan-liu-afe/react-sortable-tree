@@ -7,7 +7,7 @@ import {
 const memoize = (f: (...args: any) => void) => {
   let savedArgsArray: any = []
   let savedKeysArray: any = []
-  let savedResult: any = null
+  let savedResult: any
 
   return (args: any) => {
     const keysArray = Object.keys(args).sort()

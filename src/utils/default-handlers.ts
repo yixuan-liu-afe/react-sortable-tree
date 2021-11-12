@@ -33,7 +33,7 @@ export interface TreeIndex {
 }
 
 export interface FullTree {
-  treeData: TreeItem[] | undefined | null
+  treeData: TreeItem[] | undefined
 }
 
 export interface NodeData extends TreeNode, TreePath, TreeIndex {}
@@ -51,7 +51,7 @@ const getReactElementText = (parent: any) => {
   }
 
   if (
-    parent === null ||
+    parent === undefined ||
     typeof parent !== 'object' ||
     !parent.props ||
     !parent.props.children ||
@@ -80,17 +80,15 @@ const stringSearch = (
 ) => {
   if (typeof node[key] === 'function') {
     // Search within text after calling its function to generate the text
-    return (
-      String(node[key]({ node, path, treeIndex })).indexOf(searchQuery) > -1
-    )
+    return String(node[key]({ node, path, treeIndex })).includes(searchQuery)
   }
   if (typeof node[key] === 'object') {
     // Search within text inside react elements
-    return getReactElementText(node[key]).indexOf(searchQuery) > -1
+    return getReactElementText(node[key]).includes(searchQuery)
   }
 
   // Search within string
-  return node[key] && String(node[key]).indexOf(searchQuery) > -1
+  return node[key] && String(node[key]).includes(searchQuery)
 }
 
 export const defaultSearchMethod = ({

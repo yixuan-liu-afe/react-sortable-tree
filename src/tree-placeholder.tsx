@@ -6,7 +6,7 @@ import { TreeItem } from '.'
 
 const defaultProps = {
   canDrop: false,
-  draggedNode: null,
+  draggedNode: undefined,
 }
 
 type TreePlaceholderProps = {

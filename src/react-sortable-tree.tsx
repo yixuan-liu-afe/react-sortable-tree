@@ -53,17 +53,17 @@ const mergeTheme = (props) => {
     slideRegionSize: 100,
     treeNodeRenderer: TreeNode,
   }
-  Object.keys(overridableDefaults).forEach((propKey) => {
+  for (const propKey of Object.keys(overridableDefaults)) {
     // If prop has been specified, do not change it
     // If prop is specified in theme, use the theme setting
     // If all else fails, fall back to the default
-    if (props[propKey] === null) {
+    if (props[propKey] === undefined) {
       merged[propKey] =
         typeof props.theme[propKey] !== 'undefined'
           ? props.theme[propKey]
           : overridableDefaults[propKey]
     }
-  })
+  }
 
   return merged
 }
@@ -105,20 +105,20 @@ class ReactSortableTree extends Component {
     this.hStrength = createHorizontalStrength(slideRegionSize)
 
     this.state = {
-      draggingTreeData: null,
-      draggedNode: null,
-      draggedMinimumTreeIndex: null,
-      draggedDepth: null,
+      draggingTreeData: undefined,
+      draggedNode: undefined,
+      draggedMinimumTreeIndex: undefined,
+      draggedDepth: undefined,
       searchMatches: [],
-      searchFocusTreeIndex: null,
+      searchFocusTreeIndex: undefined,
       dragging: false,
 
       // props that need to be used in gDSFP or static functions will be stored here
       instanceProps: {
         treeData: [],
         ignoreOneTreeUpdate: false,
-        searchQuery: null,
-        searchFocusOffset: null,
+        searchQuery: undefined,
+        searchFocusOffset: undefined,
       },
     }
 
@@ -177,7 +177,7 @@ class ReactSortableTree extends Component {
       if (instanceProps.ignoreOneTreeUpdate) {
         instanceProps.ignoreOneTreeUpdate = false
       } else {
-        newState.searchFocusTreeIndex = null
+        newState.searchFocusTreeIndex = undefined
         ReactSortableTree.loadLazyChildren(nextProps, prevState)
         Object.assign(
           newState,
@@ -185,10 +185,10 @@ class ReactSortableTree extends Component {
         )
       }
 
-      newState.draggingTreeData = null
-      newState.draggedNode = null
-      newState.draggedMinimumTreeIndex = null
-      newState.draggedDepth = null
+      newState.draggingTreeData = undefined
+      newState.draggedNode = undefined
+      newState.draggedMinimumTreeIndex = undefined
+      newState.draggedDepth = undefined
       newState.dragging = false
     } else if (!isEqual(instanceProps.searchQuery, nextProps.searchQuery)) {
       Object.assign(
@@ -214,13 +214,14 @@ class ReactSortableTree extends Component {
   // listen to dragging
   componentDidUpdate(prevProps, prevState) {
     // if it is not the same then call the onDragStateChanged
-    if (this.state.dragging !== prevState.dragging) {
-      if (this.props.onDragStateChanged) {
-        this.props.onDragStateChanged({
-          isDragging: this.state.dragging,
-          draggedNode: this.state.draggedNode,
-        })
-      }
+    if (
+      this.state.dragging !== prevState.dragging &&
+      this.props.onDragStateChanged
+    ) {
+      this.props.onDragStateChanged({
+        isDragging: this.state.dragging,
+        draggedNode: this.state.draggedNode,
+      })
     }
   }
 
@@ -355,10 +356,10 @@ class ReactSortableTree extends Component {
       searchFinishCallback(searchMatches)
     }
 
-    let searchFocusTreeIndex = null
+    let searchFocusTreeIndex
     if (
       seekIndex &&
-      searchFocusOffset !== null &&
+      searchFocusOffset !== undefined &&
       searchFocusOffset < searchMatches.length
     ) {
       searchFocusTreeIndex = searchMatches[searchFocusOffset].treeIndex
@@ -434,7 +435,7 @@ class ReactSortableTree extends Component {
         }),
         // reset the scroll focus so it doesn't jump back
         // to a search result while dragging
-        searchFocusTreeIndex: null,
+        searchFocusTreeIndex: undefined,
         dragging: true,
       }
     })
@@ -445,10 +446,10 @@ class ReactSortableTree extends Component {
 
     const resetTree = () =>
       this.setState({
-        draggingTreeData: null,
-        draggedNode: null,
-        draggedMinimumTreeIndex: null,
-        draggedDepth: null,
+        draggingTreeData: undefined,
+        draggedNode: undefined,
+        draggedMinimumTreeIndex: undefined,
+        draggedDepth: undefined,
         dragging: false,
       })
 
@@ -485,10 +486,10 @@ class ReactSortableTree extends Component {
       this.props.onMoveNode({
         treeData,
         node,
-        treeIndex: null,
-        path: null,
-        nextPath: null,
-        nextTreeIndex: null,
+        treeIndex: undefined,
+        path: undefined,
+        nextPath: undefined,
+        nextTreeIndex: undefined,
         prevPath: path,
         prevTreeIndex: treeIndex,
       })
@@ -641,12 +642,12 @@ class ReactSortableTree extends Component {
     } = this.state
 
     const treeData = this.state.draggingTreeData || instanceProps.treeData
-    const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : null
+    const rowDirectionClass = rowDirection === 'rtl' ? 'rst__rtl' : undefined
 
     let rows
-    let swapFrom = null
-    let swapLength = null
-    if (draggedNode && draggedMinimumTreeIndex !== null) {
+    let swapFrom
+    let swapLength
+    if (draggedNode && draggedMinimumTreeIndex !== undefined) {
       const addedResult = memoizedInsertNode({
         treeData,
         newNode: draggedNode,
@@ -671,12 +672,12 @@ class ReactSortableTree extends Component {
 
     // Get indices for rows that match the search conditions
     const matchKeys = {}
-    searchMatches.forEach(({ path }, i) => {
+    for (const [i, { path }] of searchMatches.entries()) {
       matchKeys[path[path.length - 1]] = i
-    })
+    }
 
     // Seek to the focused search result if there is one specified
-    if (searchFocusTreeIndex !== null) {
+    if (searchFocusTreeIndex !== undefined) {
       this.listRef.current.scrollToIndex({
         index: searchFocusTreeIndex,
         align: 'center',
@@ -685,7 +686,7 @@ class ReactSortableTree extends Component {
 
     let containerStyle = style
     let list
-    if (rows.length < 1) {
+    if (rows.length === 0) {
       const Placeholder = this.treePlaceholderRenderer
       const PlaceholderContent = placeholderRenderer
       list = (
@@ -709,7 +710,7 @@ class ReactSortableTree extends Component {
           itemContent={(index) =>
             this.renderRow(rows[index], {
               listIndex: index,
-              getPrevRow: () => rows[index - 1] || null,
+              getPrevRow: () => rows[index - 1] || undefined,
               matchKeys,
               swapFrom,
               swapDepth: draggedDepth,
@@ -910,26 +911,26 @@ type ReactSortableTreeProps = {
 
 ReactSortableTree.defaultProps = {
   canDrag: true,
-  canDrop: null,
+  canDrop: undefined,
   canNodeHaveChildren: () => true,
   className: '',
-  dndType: null,
-  generateNodeProps: null,
+  dndType: undefined,
+  generateNodeProps: undefined,
   getNodeKey: defaultGetNodeKey,
   innerStyle: {},
-  maxDepth: null,
-  treeNodeRenderer: null,
-  nodeContentRenderer: null,
+  maxDepth: undefined,
+  treeNodeRenderer: undefined,
+  nodeContentRenderer: undefined,
   onMoveNode: () => {},
   onVisibilityToggle: () => {},
-  placeholderRenderer: null,
-  scaffoldBlockPxWidth: null,
-  searchFinishCallback: null,
-  searchFocusOffset: null,
-  searchMethod: null,
-  searchQuery: null,
+  placeholderRenderer: undefined,
+  scaffoldBlockPxWidth: undefined,
+  searchFinishCallback: undefined,
+  searchFocusOffset: undefined,
+  searchMethod: undefined,
+  searchQuery: undefined,
   shouldCopyOnOutsideDrop: false,
-  slideRegionSize: null,
+  slideRegionSize: undefined,
   style: {},
   theme: {},
   onDragStateChanged: () => {},
@@ -938,21 +939,25 @@ ReactSortableTree.defaultProps = {
   debugMode: false,
 }
 
-const SortableTreeWithoutDndContext = (props: ReactSortableTreeProps) => (
-  <DndContext.Consumer>
-    {({ dragDropManager }) =>
-      dragDropManager === undefined ? null : (
-        <ReactSortableTree {...props} dragDropManager={dragDropManager} />
-      )
-    }
-  </DndContext.Consumer>
-)
+const SortableTreeWithoutDndContext = function (props: ReactSortableTreeProps) {
+  return (
+    <DndContext.Consumer>
+      {({ dragDropManager }) =>
+        dragDropManager === undefined ? undefined : (
+          <ReactSortableTree {...props} dragDropManager={dragDropManager} />
+        )
+      }
+    </DndContext.Consumer>
+  )
+}
 
-const SortableTree = (props: ReactSortableTreeProps) => (
-  <DndProvider debugMode={props.debugMode} backend={HTML5Backend}>
-    <SortableTreeWithoutDndContext {...props} />
-  </DndProvider>
-)
+const SortableTree = function (props: ReactSortableTreeProps) {
+  return (
+    <DndProvider debugMode={props.debugMode} backend={HTML5Backend}>
+      <SortableTreeWithoutDndContext {...props} />
+    </DndProvider>
+  )
+}
 
 // Export the tree component without the react-dnd DragDropContext,
 // for when component is used with other components using react-dnd.
