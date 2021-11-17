@@ -787,7 +787,7 @@ type OnDragStateChangedParams = {
   draggedNode: any
 }
 
-type ReactSortableTreeProps = {
+export type ReactSortableTreeProps = {
   dragDropManager?: {
     getMonitor: () => unknown
   }
