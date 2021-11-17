@@ -20,13 +20,7 @@ type TreePlaceholderProps = {
 
 const TreePlaceholder = (props: TreePlaceholderProps) => {
   props = { ...defaultProps, ...props }
-  const {
-    children,
-    connectDropTarget,
-    treeId: _treeId,
-    drop: _drop,
-    ...otherProps
-  } = props
+  const { children, connectDropTarget, treeId, drop, ...otherProps } = props
 
   return connectDropTarget(
     <div>

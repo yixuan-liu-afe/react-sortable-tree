@@ -178,8 +178,7 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
     }
   }
 
-  let style
-  style =
+  const style =
     rowDirection === 'rtl'
       ? { right: scaffoldBlockPxWidth * scaffoldBlockCount }
       : { left: scaffoldBlockPxWidth * scaffoldBlockCount }
