@@ -183,23 +183,15 @@ const canDrop = (
 
   if (typeof treeRefcanDrop === 'function') {
     const { node } = monitor.getItem()
-    const addedResult = memoizedInsertNode({
-      treeData: draggingTreeData || treeReftreeData,
-      newNode: node,
-      depth: targetDepth,
-      getNodeKey,
-      minimumTreeIndex: dropTargetProps.listIndex,
-      expandParent: true,
-    })
 
     return treeRefcanDrop({
       node,
       prevPath: monitor.getItem().path,
       prevParent: monitor.getItem().parentNode,
       prevTreeIndex: monitor.getItem().treeIndex, // Equals -1 when dragged from external tree
-      nextPath: addedResult.path,
-      nextParent: addedResult.parentNode,
-      nextTreeIndex: addedResult.treeIndex,
+      nextPath: dropTargetProps.children.props.path,
+      nextParent: dropTargetProps.children.props.parentNode,
+      nextTreeIndex: dropTargetProps.children.props.treeIndex,
     })
   }
 
