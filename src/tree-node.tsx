@@ -22,6 +22,7 @@ export interface TreeRendererProps {
   scaffoldBlockPxWidth: number
   lowerSiblingCounts: number[]
   rowDirection?: 'ltr' | 'rtl' | string | undefined
+  rowHeight: number | ((treeIndex: number, node: any, path: any[]) => number)
 
   listIndex: number
   children: JSX.Element[]
@@ -63,6 +64,7 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
     draggedNode,
     canDrop,
     treeIndex,
+    rowHeight,
     treeId: _treeId, // Delete from otherProps
     getPrevRow: _getPrevRow, // Delete from otherProps
     node: _node, // Delete from otherProps
@@ -183,9 +185,14 @@ const TreeNode: React.FC<TreeRendererProps> = (props) => {
       ? { right: scaffoldBlockPxWidth * scaffoldBlockCount }
       : { left: scaffoldBlockPxWidth * scaffoldBlockCount }
 
+  let calculatedRowHeight = rowHeight
+  if (typeof rowHeight === 'function') {
+    calculatedRowHeight = rowHeight(treeIndex, _node, _path)
+  }
   return connectDropTarget(
     <div
       {...otherProps}
+      style={{ height: `${calculatedRowHeight}px` }}
       className={classnames('rst__node', rowDirectionClass ?? '')}>
       {scaffold}
 
