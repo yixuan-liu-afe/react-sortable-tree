@@ -210,7 +210,7 @@ class ReactSortableTree extends Component {
     // Prepare scroll-on-drag options for this list
     this.scrollZoneVirtualList = (createScrollingComponent || withScrolling)(
       React.forwardRef((props, ref) => {
-        const { dragDropManager, ...otherProps } = props
+        const { dragDropManager, rowHeight, ...otherProps } = props
         return <Virtuoso ref={this.listRef} {...otherProps} />
       })
     )
