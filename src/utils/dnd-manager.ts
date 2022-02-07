@@ -106,8 +106,7 @@ const getTargetDepth = (
     dragSourceInitialDepth = 0
 
     if (component) {
-      const rawComponent = component.getDecoratedComponentInstance()
-      const relativePosition = rawComponent.node.getBoundingClientRect()
+      const relativePosition = component.node.getBoundingClientRect()
       const leftShift =
         monitor.getSourceClientOffset().x - relativePosition.left
       blocksOffset = Math.round(
