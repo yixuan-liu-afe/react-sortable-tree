@@ -20,7 +20,8 @@
     "plugin:import/typescript",
     "plugin:react-hooks/recommended",
     "plugin:promise/recommended",
-    "plugin:unicorn/recommended"
+    "plugin:unicorn/recommended",
+    "plugin:storybook/recommended"
   ],
   "plugins": [
     "@typescript-eslint",

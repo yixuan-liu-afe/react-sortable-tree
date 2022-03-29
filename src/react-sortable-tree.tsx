@@ -910,6 +910,8 @@ export type ReactSortableTreeProps = {
   rowDirection?: string
 
   debugMode?: boolean
+
+  overscan?: number | { main: number; reverse: number }
 }
 
 ReactSortableTree.defaultProps = {
@@ -940,6 +942,7 @@ ReactSortableTree.defaultProps = {
   onlyExpandSearchedNodes: false,
   rowDirection: 'ltr',
   debugMode: false,
+  overscan: 0,
 }
 
 const SortableTreeWithoutDndContext = function (props: ReactSortableTreeProps) {

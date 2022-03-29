@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 4.1.0
+* overscan: number | { main: number ; reverse: number }
+The property accepts pixel values.
+* Bump deps
+
 ## 4.0.0-beta.10
 * Update some TS types
 * Bump deps
