@@ -61,7 +61,7 @@ function createESMConfig(input, output) {
     plugins: [
       nodeResolve({ extensions }),
       postcss({ extract: 'style.css' }),
-      getEsbuild('node14'),
+      getEsbuild('node16'),
     ],
   }
 }
@@ -76,7 +76,7 @@ function createCommonJSConfig(input, output) {
       nodeResolve({ extensions }),
       postcss({ extract: 'style.css' }),
       typescript(),
-      babel(getBabelOptions({ ie: 11 })),
+      babel(getBabelOptions({ chrome: 95 })),
     ],
   }
 }
