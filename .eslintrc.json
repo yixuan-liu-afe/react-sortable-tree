@@ -3,7 +3,7 @@
     "browser": true,
     "shared-node-browser": true,
     "node": true,
-    "es2020": true
+    "es2021": true
   },
   "extends": [
     "airbnb",
@@ -34,7 +34,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": 2021,
     "sourceType": "module",
     "project": "./tsconfig.json",
     "ecmaFeatures": {
