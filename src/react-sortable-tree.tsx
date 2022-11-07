@@ -280,15 +280,16 @@ class ReactSortableTree extends Component {
   static getDerivedStateFromProps(nextProps, prevState) {
     const { instanceProps } = prevState
     const newState = {}
+    const newInstanceProps = { ...instanceProps }
 
     const isTreeDataEqual = isEqual(instanceProps.treeData, nextProps.treeData)
 
     // make sure we have the most recent version of treeData
-    instanceProps.treeData = nextProps.treeData
+    newInstanceProps.treeData = nextProps.treeData
 
     if (!isTreeDataEqual) {
       if (instanceProps.ignoreOneTreeUpdate) {
-        instanceProps.ignoreOneTreeUpdate = false
+        newInstanceProps.ignoreOneTreeUpdate = false
       } else {
         newState.searchFocusTreeIndex = undefined
         ReactSortableTree.loadLazyChildren(nextProps, prevState)
@@ -317,9 +318,9 @@ class ReactSortableTree extends Component {
       )
     }
 
-    instanceProps.searchQuery = nextProps.searchQuery
-    instanceProps.searchFocusOffset = nextProps.searchFocusOffset
-    newState.instanceProps = { ...instanceProps, ...newState.instanceProps }
+    newInstanceProps.searchQuery = nextProps.searchQuery
+    newInstanceProps.searchFocusOffset = nextProps.searchFocusOffset
+    newState.instanceProps = { ...newInstanceProps, ...newState.instanceProps }
 
     return newState
   }
