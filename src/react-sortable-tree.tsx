@@ -211,7 +211,13 @@ class ReactSortableTree extends Component {
     this.scrollZoneVirtualList = (createScrollingComponent || withScrolling)(
       React.forwardRef((props, ref) => {
         const { dragDropManager, rowHeight, ...otherProps } = props
-        return <Virtuoso ref={this.listRef} {...otherProps} />
+        return (
+          <Virtuoso
+            ref={this.listRef}
+            scrollerRef={(scrollContainer) => (ref.current = scrollContainer)}
+            {...otherProps}
+          />
+        )
       })
     )
     this.vStrength = createVerticalStrength(slideRegionSize)
