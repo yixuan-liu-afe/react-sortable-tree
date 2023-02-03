@@ -95,7 +95,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
       typeof node.children === 'function' && node.expanded ? (
         <div className="rst__loadingHandle">
           <div className="rst__loadingCircle">
-            {[...Array.from({ length: 12 })].map((_, index) => (
+            {Array.from({ length: 12 }).map((_, index) => (
               <div
                 key={index}
                 className={classnames(
@@ -178,7 +178,7 @@ const NodeRendererDefault: React.FC<NodeRendererProps> = function (props) {
             <div
               className={classnames(
                 'rst__rowContents',
-                !canDrag ? 'rst__rowContentsDragDisabled' : '',
+                canDrag ? '' : 'rst__rowContentsDragDisabled',
                 rowDirectionClass ?? ''
               )}>
               <div

@@ -47,9 +47,9 @@ const getNodeDataAtTreeIndexOrNextIndex = ({
   isPseudoRoot: boolean
 }) => {
   // The pseudo-root is not considered in the path
-  const selfPath = !isPseudoRoot
-    ? [...path, getNodeKey({ node, treeIndex: currentIndex })]
-    : []
+  const selfPath = isPseudoRoot
+    ? []
+    : [...path, getNodeKey({ node, treeIndex: currentIndex })]
 
   // Return target node when found
   if (currentIndex === targetIndex) {

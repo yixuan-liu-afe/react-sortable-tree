@@ -59,9 +59,9 @@ const mergeTheme = (props) => {
     // If all else fails, fall back to the default
     if (props[propKey] === undefined) {
       merged[propKey] =
-        typeof props.theme[propKey] !== 'undefined'
-          ? props.theme[propKey]
-          : overridableDefaults[propKey]
+        props.theme[propKey] === undefined
+          ? overridableDefaults[propKey]
+          : props.theme[propKey]
     }
   }
 
@@ -588,11 +588,9 @@ class ReactSortableTree extends Component {
       isSearchMatch,
       isSearchFocus,
     }
-    const nodeProps = !generateNodeProps
-      ? {}
-      : generateNodeProps(callbackParams)
+    const nodeProps = generateNodeProps ? generateNodeProps(callbackParams) : {}
     const rowCanDrag =
-      typeof canDrag !== 'function' ? canDrag : canDrag(callbackParams)
+      typeof canDrag === 'function' ? canDrag(callbackParams) : canDrag
 
     const sharedProps = {
       treeIndex,

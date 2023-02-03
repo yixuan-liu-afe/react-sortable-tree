@@ -101,7 +101,15 @@ const getTargetDepth = (
   let dragSourceInitialDepth = (monitor.getItem().path || []).length
 
   // When adding node from external source
-  if (monitor.getItem().treeId !== treeId) {
+  if (monitor.getItem().treeId === treeId) {
+    // handle row direction support
+    const direction = dropTargetProps.rowDirection === 'rtl' ? -1 : 1
+
+    blocksOffset = Math.round(
+      (direction * monitor.getDifferenceFromInitialOffset().x) /
+        dropTargetProps.scaffoldBlockPxWidth
+    )
+  } else {
     // Ignore the tree depth of the source, if it had any to begin with
     dragSourceInitialDepth = 0
 
@@ -115,14 +123,6 @@ const getTargetDepth = (
     } else {
       blocksOffset = dropTargetProps.path.length
     }
-  } else {
-    // handle row direction support
-    const direction = dropTargetProps.rowDirection === 'rtl' ? -1 : 1
-
-    blocksOffset = Math.round(
-      (direction * monitor.getDifferenceFromInitialOffset().x) /
-        dropTargetProps.scaffoldBlockPxWidth
-    )
   }
 
   let targetDepth = Math.min(
@@ -131,7 +131,7 @@ const getTargetDepth = (
   )
 
   // If a maxDepth is defined, constrain the target depth
-  if (typeof maxDepth !== 'undefined' && maxDepth !== undefined) {
+  if (maxDepth !== undefined && maxDepth !== undefined) {
     const draggedNode = monitor.getItem().node
     const draggedChildDepth = getDepth(draggedNode)
 
