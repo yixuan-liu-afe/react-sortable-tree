@@ -5,7 +5,7 @@ import typescript from '@rollup/plugin-typescript'
 import jsx from 'acorn-jsx'
 import esbuild from 'rollup-plugin-esbuild'
 import postcss from 'rollup-plugin-postcss'
-const createBabelConfig = require('./babel.config')
+import createBabelConfig from './babel.config.js'
 
 const extensions = ['.js', '.ts', '.tsx']
 const { root } = path.parse(process.cwd())
