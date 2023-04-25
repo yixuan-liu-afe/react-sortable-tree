@@ -18,6 +18,7 @@ import ThemesExample from './themes'
 import TouchSupportExample from './touch-support'
 import TreeDataIOExample from './tree-data-io'
 import TreeToTreeExample from './tree-to-tree'
+import VirtuosoPropsExample from './virtuoso-props'
 
 storiesOf('Basics', module)
   .add('Minimal implementation', () => <BarebonesExample />)
@@ -29,6 +30,7 @@ storiesOf('Basics', module)
   .add('Themes', () => <ThemesExample />)
   .add('Callbacks', () => <CallbacksExample />)
   .add('Row direction support', () => <RowDirectionExample />)
+  .add('Virtuoso properties', () => <VirtuosoPropsExample />)
 
 storiesOf('Advanced', module)
   .add('Drag from external source', () => <ExternalNodeExample />)
