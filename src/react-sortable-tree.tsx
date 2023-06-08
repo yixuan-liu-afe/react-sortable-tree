@@ -576,7 +576,7 @@ class ReactSortableTree extends Component {
     } = mergeTheme(this.props)
     const TreeNodeRenderer = this.treeNodeRenderer
     const NodeContentRenderer = this.nodeContentRenderer
-    const nodeKey = path[path.length - 1]
+    const nodeKey = path.at(-1)
     const isSearchMatch = nodeKey in matchKeys
     const isSearchFocus =
       isSearchMatch && matchKeys[nodeKey] === searchFocusOffset
@@ -678,7 +678,7 @@ class ReactSortableTree extends Component {
     // Get indices for rows that match the search conditions
     const matchKeys = {}
     for (const [i, { path }] of searchMatches.entries()) {
-      matchKeys[path[path.length - 1]] = i
+      matchKeys[path.at(-1)] = i
     }
 
     // Seek to the focused search result if there is one specified
