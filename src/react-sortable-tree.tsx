@@ -909,7 +909,9 @@ export type ReactSortableTreeProps = {
 
   // When true, or a callback returning true, dropping nodes to react-dnd
   // drop targets outside of this tree will not remove them from this tree
-  shouldCopyOnOutsideDrop?: (params: ShouldCopyOnOutsideDropParams) => boolean
+  shouldCopyOnOutsideDrop?:
+    | ((params: ShouldCopyOnOutsideDropParams) => boolean)
+    | boolean
 
   // Called after children nodes collapsed or expanded.
   onVisibilityToggle?: (params: OnVisibilityToggleParams) => void

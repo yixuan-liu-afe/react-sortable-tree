@@ -878,6 +878,11 @@ export const getTreeFromFlatData = ({
   getKey = (node) => node.id,
   getParentKey = (node) => node.parentId,
   rootKey = '0',
+}: {
+  flatData: any
+  getKey: (node: any) => string
+  getParentKey: (node: any) => string
+  rootKey: string | null
 }) => {
   if (!flatData) {
     return []
