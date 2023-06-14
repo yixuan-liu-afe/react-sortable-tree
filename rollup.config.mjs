@@ -76,7 +76,7 @@ function createCommonJSConfig(input, output) {
       nodeResolve({ extensions }),
       postcss({ extract: 'style.css' }),
       typescript(),
-      babel(getBabelOptions({ chrome: 95 })),
+      babel(getBabelOptions({ chrome: 100 })),
     ],
   }
 }
