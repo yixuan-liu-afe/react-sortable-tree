@@ -1,90 +1,46 @@
-import path from 'path'
-import babel from '@rollup/plugin-babel'
-import nodeResolve from '@rollup/plugin-node-resolve'
-import typescript from '@rollup/plugin-typescript'
-import jsx from 'acorn-jsx'
-import esbuild from 'rollup-plugin-esbuild'
-import postcss from 'rollup-plugin-postcss'
-import createBabelConfig from './babel.config.js'
+import peerDepsExternal from "rollup-plugin-peer-deps-external";
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
+import postcss from "rollup-plugin-postcss";
+import dts from "rollup-plugin-dts";
+import terser from "@rollup/plugin-terser";
 
-const extensions = ['.js', '.ts', '.tsx']
-const { root } = path.parse(process.cwd())
+// This is required to read package.json file when
+// using Native ES modules in Node.js
+// https://rollupjs.org/command-line-interface/#importing-package-json
+import { createRequire } from 'node:module';
+const requireFile = createRequire(import.meta.url);
+const packageJson = requireFile('./package.json');
 
-function external(id) {
-  return !id.startsWith('.') && !id.startsWith(root)
-}
 
-function getBabelOptions(targets) {
-  return {
-    ...createBabelConfig({ env: (env) => env === 'build' }, targets),
-    extensions,
-    comments: false,
-    babelHelpers: 'bundled',
-  }
-}
-
-function getEsbuild(target) {
-  return esbuild({
-    minify: false,
-    target,
-    tsconfig: path.resolve('./tsconfig.json'),
-  })
-}
-
-function createDeclarationConfig(input, output) {
-  return {
-    input,
-    output: {
-      dir: output,
+export default [{
+  input: "src/index.ts",
+  output: [
+    {
+      file: packageJson.main,
+      format: "cjs",
+      sourcemap: true
     },
-    external,
-    acornInjectPlugins: [jsx()],
-    plugins: [
-      postcss({ extract: 'style.css' }),
-      typescript({
-        declaration: true,
-        emitDeclarationOnly: true,
-        outDir: output,
-      }),
-    ],
-  }
-}
-
-function createESMConfig(input, output) {
-  return {
-    input,
-    output: [
-      { file: `${output}.js`, format: 'esm' },
-      { file: `${output}.mjs`, format: 'esm' },
-    ],
-    external,
-    plugins: [
-      nodeResolve({ extensions }),
-      postcss({ extract: 'style.css' }),
-      getEsbuild('node16'),
-    ],
-  }
-}
-
-function createCommonJSConfig(input, output) {
-  return {
-    input,
-    output: { file: output, format: 'cjs', exports: 'named' },
-    external,
-    acornInjectPlugins: [jsx()],
-    plugins: [
-      nodeResolve({ extensions }),
-      postcss({ extract: 'style.css' }),
-      typescript(),
-      babel(getBabelOptions({ chrome: 100 })),
-    ],
-  }
-}
-
-export default function (args) {
-  return [
-    createDeclarationConfig('src/index.ts', 'dist'),
-    createCommonJSConfig('src/index.ts', 'dist/index.js'),
-    createESMConfig('src/index.ts', 'dist/esm/index'),
+    {
+      file: packageJson.module,
+      format: "esm",
+      sourcemap: true
+    }
+  ],
+  plugins: [
+    peerDepsExternal(),
+    resolve(),
+    commonjs(),
+    typescript(),
+    postcss({
+      extensions: ['.css']
+    }),
+    terser(),
   ]
-}
+}, {
+  input: 'lib/index.d.ts',
+  output: [{ file: 'lib/index.d.ts', format: 'es' }],
+  plugins: [dts()],
+  external: [/\.css$/]
+}];
