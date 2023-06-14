@@ -1,13 +1,8 @@
 module.exports = {
-  stories: ['../stories/index.js'],
-  addons: [
-    {
-      name: '@storybook/addon-postcss',
-      options: {
-        postcssLoaderOptions: {
-          implementation: require('postcss'), // eslint-disable-line global-require
-        },
-      },
-    },
-  ]
+  "stories": ["../src/**/*.stories.tsx"],
+  "addons": ["@storybook/addon-links", "@storybook/addon-essentials", "@storybook/addon-styling", "@storybook/addon-actions"],
+  framework: {
+    name: "@storybook/react-webpack5",
+    options: {}
+  }
 };
