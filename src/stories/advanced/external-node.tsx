@@ -1,8 +1,7 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import React, { Component, useState } from 'react'
 import { DndProvider, DragSource } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
-import { SortableTreeWithoutDndContext as SortableTree } from '../src'
+import { SortableTreeWithoutDndContext as SortableTree } from '../../../src'
 // In your own app, you would need to use import styles once in the app
 // import 'react-sortable-tree/styles.css';
 
@@ -16,9 +15,9 @@ const externalNodeSpec = {
   // This needs to return an object with a property `node` in it.
   // Object rest spread is recommended to avoid side effects of
   // referencing the same object in different trees.
-  beginDrag: (componentProps) => ({ node: { ...componentProps.node } }),
+  beginDrag: (componentProps: any) => ({ node: { ...componentProps.node } }),
 }
-const externalNodeCollect = (connect /* , monitor */) => ({
+const externalNodeCollect = (connect: any /* , monitor */) => ({
   connectDragSource: connect.dragSource(),
   // Add props via react-dnd APIs to enable more visual
   // customization of your component
@@ -27,7 +26,7 @@ const externalNodeCollect = (connect /* , monitor */) => ({
 })
 class externalNodeBaseComponent extends Component {
   render() {
-    const { connectDragSource, node } = this.props
+    const { connectDragSource, node }: any = this.props
 
     return connectDragSource(
       <div
@@ -43,42 +42,31 @@ class externalNodeBaseComponent extends Component {
     )
   }
 }
-externalNodeBaseComponent.propTypes = {
-  node: PropTypes.shape({ title: PropTypes.string }).isRequired,
-  connectDragSource: PropTypes.func.isRequired,
-}
+
 const YourExternalNodeComponent = DragSource(
   externalNodeType,
   externalNodeSpec,
   externalNodeCollect
 )(externalNodeBaseComponent)
 
-class App extends Component {
-  constructor(props) {
-    super(props)
+const ExternalNode: React.FC = () => {
+  const [treeData, setTreeData] = useState([{ title: 'Mama Rabbit' }, { title: 'Papa Rabbit' }]);
 
-    this.state = {
-      treeData: [{ title: 'Mama Rabbit' }, { title: 'Papa Rabbit' }],
-    }
-  }
-
-  render() {
-    return (
-      <DndProvider backend={HTML5Backend}>
-        <div>
-          <div style={{ height: 300 }}>
-            <SortableTree
-              treeData={this.state.treeData}
-              onChange={(treeData) => this.setState({ treeData })}
-              dndType={externalNodeType}
-            />
-          </div>
-          <YourExternalNodeComponent node={{ title: 'Baby Rabbit' }} />← drag
-          this
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div>
+        <div style={{ height: 300, width: 700 }}>
+          <SortableTree
+            treeData={treeData}
+            onChange={setTreeData}
+            dndType={externalNodeType}
+          />
         </div>
-      </DndProvider>
-    )
-  }
+        <YourExternalNodeComponent node={{ title: 'Baby Rabbit' }} />← drag
+        this
+      </div>
+    </DndProvider>
+  )
 }
 
-export default App
+export default ExternalNode;

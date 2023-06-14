@@ -1,83 +1,72 @@
-import React, { Component } from 'react'
-import SortableTree from '../src'
+import React, { Component, useState } from 'react'
+import SortableTree from '../../../src'
 // In your own app, you would need to use import styles once in the app
 // import 'react-sortable-tree/styles.css';
 
-export default class App extends Component {
-  constructor(props) {
-    super(props)
+const OnlyExpandSearchedNodes: React.FC = () => {
+  const title = 'Hay';
 
-    const title = 'Hay'
-
-    // For generating a haystack (you probably won't need to do this)
-    const getStack = (left, hasNeedle = false) => {
-      if (left === 0) {
-        return hasNeedle ? { title: 'Needle' } : { title }
-      }
-
-      return {
-        title,
-        children: [
-          {
-            title,
-            children: [getStack(left - 1, hasNeedle && left % 2), { title }],
-          },
-          { title },
-          {
-            title,
-            children: [
-              { title },
-              getStack(left - 1, hasNeedle && (left + 1) % 2),
-            ],
-          },
-        ],
-      }
+  // For generating a haystack (you probably won't need to do this)
+  const getStack = (left: number, hasNeedle: any = false): any => {
+    if (left === 0) {
+      return hasNeedle ? { title: 'Needle' } : { title }
     }
 
-    this.state = {
-      searchString: '',
-      searchFocusIndex: 0,
-      searchFoundCount: null,
-      treeData: [
+    return {
+      title,
+      children: [
         {
-          title: 'Haystack',
+          title,
+          children: [getStack(left - 1, hasNeedle && left % 2), { title }],
+        },
+        { title },
+        {
+          title,
           children: [
-            getStack(3, true),
-            getStack(3),
             { title },
-            getStack(2, true),
+            getStack(left - 1, hasNeedle && (left + 1) % 2),
           ],
         },
       ],
     }
   }
 
-  render() {
-    const { searchString, searchFocusIndex, searchFoundCount } = this.state
+  const [searchString, setSearchString] = useState('');
+  const [searchFocusIndex, setSearchFocusIndex] = useState(0);
+  const [searchFoundCount, setSearchFoundCount] = useState(0);
+  const [treeData, setTreeData] = useState([
+    {
+      title: 'Haystack',
+      children: [
+        getStack(3, true),
+        getStack(3),
+        { title },
+        getStack(2, true),
+      ],
+    },
+  ]);
 
-    // Case insensitive search of `node.title`
-    const customSearchMethod = ({ node, searchQuery }) =>
-      searchQuery &&
-      node.title.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1
+  // Case insensitive search of `node.title`
+  const customSearchMethod = ({ node, searchQuery }: any) =>
+    searchQuery &&
+    node.title.toLowerCase().indexOf(searchQuery.toLowerCase()) > -1
 
-    const selectPrevMatch = () =>
-      this.setState({
-        searchFocusIndex:
-          searchFocusIndex !== null
-            ? (searchFoundCount + searchFocusIndex - 1) % searchFoundCount
-            : searchFoundCount - 1,
-      })
+  const selectPrevMatch = () =>
+    setSearchFocusIndex(
+      searchFocusIndex !== null
+        ? (searchFoundCount + searchFocusIndex - 1) % searchFoundCount
+        : searchFoundCount - 1,
+    )
 
-    const selectNextMatch = () =>
-      this.setState({
-        searchFocusIndex:
-          searchFocusIndex !== null
-            ? (searchFocusIndex + 1) % searchFoundCount
-            : 0,
-      })
+  const selectNextMatch = () =>
+    setSearchFocusIndex(
+      searchFocusIndex !== null
+        ? (searchFocusIndex + 1) % searchFoundCount
+        : 0,
+    )
 
-    return (
-      <div>
+  return (
+    <div>
         <h2>Find the needle!</h2>
         <form
           style={{ display: 'inline-block' }}
@@ -91,7 +80,7 @@ export default class App extends Component {
             style={{ fontSize: '1rem' }}
             value={searchString}
             onChange={(event) =>
-              this.setState({ searchString: event.target.value })
+              setSearchString(event.target.value)
             }
           />
 
@@ -117,10 +106,10 @@ export default class App extends Component {
           </span>
         </form>
 
-        <div style={{ height: 300 }}>
+        <div style={{ height: 300, width: 700 }}>
           <SortableTree
-            treeData={this.state.treeData}
-            onChange={(treeData) => this.setState({ treeData })}
+            treeData={treeData}
+            onChange={setTreeData}
             //
             // Custom comparison for matching during search.
             // This is optional, and defaults to a case sensitive search of
@@ -140,16 +129,17 @@ export default class App extends Component {
             // Here I just use it to note how many matches were found.
             // This is optional, but without it, the only thing searches
             // do natively is outline the matching nodes.
-            searchFinishCallback={(matches) =>
-              this.setState({
-                searchFoundCount: matches.length,
-                searchFocusIndex:
-                  matches.length > 0 ? searchFocusIndex % matches.length : 0,
-              })
-            }
+            searchFinishCallback={(matches) => {
+              setSearchFoundCount(matches.length);
+              setSearchFocusIndex(matches.length > 0 ? searchFocusIndex % matches.length : 0);
+            }}
+            //
+            // This prop only expands the nodes that are seached.
+            onlyExpandSearchedNodes
           />
         </div>
       </div>
-    )
-  }
+  )
 }
+
+export default OnlyExpandSearchedNodes;
