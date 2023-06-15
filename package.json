@@ -2,7 +2,7 @@
   "name": "@nosferatu500/react-sortable-tree",
   "version": "4.4.0",
   "description": "Drag-and-drop sortable component for nested data and hierarchies",
-  "homepage": "http://nosferatu500.github.io/react-sortable-tree",
+  "homepage": "https://nosferatu500.github.io/react-sortable-tree",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
