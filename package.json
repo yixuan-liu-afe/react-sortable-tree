@@ -2,6 +2,7 @@
   "name": "@nosferatu500/react-sortable-tree",
   "version": "4.4.0",
   "description": "Drag-and-drop sortable component for nested data and hierarchies",
+  "homepage": "http://nosferatu500.github.io/react-sortable-tree",
   "main": "lib/index.js",
   "module": "lib/index.esm.js",
   "types": "lib/index.d.ts",
@@ -12,7 +13,8 @@
     "lint": "eslint '*.{js,json}' 'src/**/*.{ts,tsx}' --cache",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "deploy-storybook": "gh-pages -d storybook-static"
   },
   "engines": {
     "node": ">=16"
@@ -80,6 +82,7 @@
     "eslint-plugin-sonarjs": "^0.19.0",
     "eslint-plugin-storybook": "^0.6.12",
     "eslint-plugin-unicorn": "^47.0.0",
+    "gh-pages": "^5.0.0",
     "postcss": "^8.4.24",
     "prettier": "^2.8.8",
     "react": "^17.0.2",
